@@ -22,6 +22,7 @@ void vertex_set_init(vertex_set* list, int count) {
     vertex_set_clear(list);
 }
 
+#define THREADS 8
 // Take one step of "top-down" BFS.  For each vertex on the frontier,
 // follow all outgoing edges, and add all neighboring vertices to the
 // new_frontier.
@@ -31,7 +32,12 @@ void top_down_step(
     vertex_set* new_frontier,
     int* distances)
 {
+    int i;
 
+    //GO THROUGH EVERY NODE IN OUR CURRENT FRONTIER
+    //#pragma omp parallel for 
+    // #define THREADS 4
+    #pragma omp parallel for schedule(dynamic, 100)
     for (int i=0; i<frontier->count; i++) {
 
         int node = frontier->vertices[i];
@@ -42,13 +48,22 @@ void top_down_step(
                            : g->outgoing_starts[node + 1];
 
         // attempt to add all neighbors to the new frontier
+        // #pragma omp parallel for 
         for (int neighbor=start_edge; neighbor<end_edge; neighbor++) {
             int outgoing = g->outgoing_edges[neighbor];
 
-            if (distances[outgoing] == NOT_VISITED_MARKER) {
-                distances[outgoing] = distances[node] + 1;
-                int index = new_frontier->count++;
-                new_frontier->vertices[index] = outgoing;
+            //IF NOT VISITED
+            //SOMETHING ABOUT THIS VARIABLE DECLARATION IS SUS 
+            int dist = -1; 
+            #pragma omp atomic read
+            dist = distances[outgoing];
+            if (dist == NOT_VISITED_MARKER) {
+                if (__sync_bool_compare_and_swap(&distances[outgoing], NOT_VISITED_MARKER, distances[node] + 1)) {  
+                    int index = 0;
+                    #pragma omp atomic capture
+                    index = new_frontier->count++;
+                    new_frontier->vertices[index] = outgoing;
+                }
             }
         }
     }
