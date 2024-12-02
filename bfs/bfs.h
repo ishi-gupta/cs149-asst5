@@ -17,6 +17,8 @@ struct vertex_set {
   int max_vertices;
   // array of vertex ids in set
   int *vertices;
+  // sparse array for bottom up bfs
+  bool *present;
 };
 
 
