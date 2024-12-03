@@ -5,6 +5,7 @@
 #include <string.h>
 #include <cstddef>
 #include <omp.h>
+#include <vector>
 
 #include "../common/CycleTimer.h"
 #include "../common/graph.h"
@@ -79,11 +80,47 @@ void top_down_step(
     }
 }
 
+void print_graph(struct graph* g) {
+    printf("Graph has %d nodes and %d edges.\n", g->num_nodes, g->num_edges);
+
+    printf("Outgoing edges:\n");
+    for (int node = 0; node < g->num_nodes; node++) {
+        int start_edge = g->outgoing_starts[node];
+        int end_edge = (node == g->num_nodes - 1) 
+                       ? g->num_edges 
+                       : g->outgoing_starts[node + 1];
+
+        printf("Node %d:", node);
+        for (int edge = start_edge; edge < end_edge; edge++) {
+            printf(" %d", g->outgoing_edges[edge]);
+        }
+        printf("\n");
+    }
+
+    printf("Incoming edges:\n");
+    for (int node = 0; node < g->num_nodes; node++) {
+        int start_edge = g->incoming_starts[node];
+        int end_edge = (node == g->num_nodes - 1) 
+                       ? g->num_edges 
+                       : g->incoming_starts[node + 1];
+
+        printf("Node %d:", node);
+        for (int edge = start_edge; edge < end_edge; edge++) {
+            printf(" %d", g->incoming_edges[edge]);
+        }
+        printf("\n");
+    }
+}
+
+
 // Implements top-down BFS.
 //
 // Result of execution is that, for each node in the graph, the
 // distance to the root is stored in sol.distances.
 void bfs_top_down(Graph graph, solution* sol) {
+
+    printf("Running top-down BFS\n");
+    //print_graph(graph);
 
     vertex_set list1;
     vertex_set list2;
@@ -123,20 +160,28 @@ void bfs_top_down(Graph graph, solution* sol) {
     }
 }
 
+int stepcount = 0;
 void bottom_up_step(
     Graph g,
     vertex_set* frontier,
     vertex_set* new_frontier,
-    int* distances)
+    int* distances,
+    std::vector<int>& remaining_nodes) // Pass the set of unvisited nodes)
 {
+    
+    printf("doing step %d\n", stepcount);
+    stepcount++;
 
+    double start_time = CycleTimer::currentSeconds();
     //j is the node we are checking to see if is in the fronteir
     int counter = 0;
-    #pragma omp parallel for reduction(+:counter) //unifies thread local counters at the end 
-    for (int node=0; node < g->num_nodes; node++) {
+    #pragma omp parallel for schedule(dynamic, 100) reduction(+:counter)//unifies thread local counters at the end 
+    for (size_t i = 0; i < remaining_nodes.size(); i++){
         //printf("hi im checking node %d\n", node);
+        int node = remaining_nodes[i];
         if (distances[node] == NOT_VISITED_MARKER) {
             //check if it has an incoming edge from a node in the fronteir 
+            double inner_start_time = CycleTimer::currentSeconds();
             for (int i=0; i<frontier->count; i++) {
                 //collecting all the nodes incoming edges 
                 int start_edge = g->incoming_starts[node];
@@ -144,6 +189,7 @@ void bottom_up_step(
                            ? g->num_edges
                            : g->incoming_starts[node + 1];
                 //going through all the nodes who are incoming to me 
+                double inner_start_time2 = CycleTimer::currentSeconds();
                 for (int neighbor=start_edge; neighbor<end_edge; neighbor++) {
                     int incoming = g->incoming_edges[neighbor];
                     if (frontier->present[incoming]) {
@@ -158,14 +204,28 @@ void bottom_up_step(
                         }
                     }
                 }
+                double inner_end_time = CycleTimer::currentSeconds();
             }
             
         }
     }
+    double end_time = CycleTimer::currentSeconds();
+    printf("Outerloop time for step %d:  %.4f sec. %f percent of total time. \n", stepcount, end_time - start_time, (end_time - start_time)/end_time - start_time *100);
+    printf("Middleloop time for step %d:  %.4f sec %f percent of total time. \n", stepcount, inner_end_time - inner_start_time, (inner_end_time - inner_start_time)/(end_time - start_time) *100);
+    printf("Innerloop time for step %d:  %.4f sec %f percent of total time. \n", stepcount, inner_end_time - inner_start_time2,(inner_end_time - inner_start_time2)/(end_time - start_time) *100);
+
+
     //counting how many nodes are there in the next fronteir
     new_frontier->count = counter;
 
-    //add the actual nodes to the fronteir
+    // Update remaining nodes
+    std::vector<int> updated_remaining_nodes;
+    for (int node : remaining_nodes) {
+        if (distances[node] == NOT_VISITED_MARKER) {
+            updated_remaining_nodes.push_back(node);
+        }
+    }
+    remaining_nodes = std::move(updated_remaining_nodes);
 
 
 }
@@ -186,10 +246,15 @@ void bfs_bottom_up(Graph graph, solution* sol)
     for (int i=0; i<graph->num_nodes; i++)
         sol->distances[i] = NOT_VISITED_MARKER;
 
+    std::vector<int> remaining_nodes;
+    for (int i = 0; i < graph->num_nodes; i++) {
+        remaining_nodes.push_back(i);
+    }
     // setup frontier with the root node
     //frontier->vertices[frontier->count++] = ROOT_NODE_ID;
     frontier->present[ROOT_NODE_ID] = true;
     sol->distances[ROOT_NODE_ID] = 0;
+    frontier->count = 1;
 
     while (frontier->count != 0) {
 
@@ -199,7 +264,7 @@ void bfs_bottom_up(Graph graph, solution* sol)
 
         vertex_set_clear(new_frontier);
 
-        bottom_up_step(graph, frontier, new_frontier, sol->distances);
+        bottom_up_step(graph, frontier, new_frontier, sol->distances, remaining_nodes);
 
 #ifdef VERBOSE
     double end_time = CycleTimer::currentSeconds();
