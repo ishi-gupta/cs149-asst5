@@ -257,13 +257,11 @@ void bottom_up_step_2(
             //going through all the nodes who are incoming to me
             for (int neighbor = start_edge; neighbor < end_edge; neighbor++) {
                 int incoming = g->incoming_edges[neighbor];
-                if (frontier->present[incoming]) {
-                    //TODO: thibk about wethe ur need compare and swap here 
-                    if (__sync_bool_compare_and_swap(&distances[node], NOT_VISITED_MARKER, distances[incoming] + 1)) { //my distance is the incoming edges already collected distance + 1  
+                if (frontier->present[incoming] && distances[node] == NOT_VISITED_MARKER) {
                         new_frontier->present[node] = true;
+                        distances[node] = distances[incoming] + 1;
                         counter++; 
                         break;
-                    }
                 }
             }
         }
