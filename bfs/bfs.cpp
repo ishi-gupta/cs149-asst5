@@ -169,7 +169,7 @@ void bottom_up_step(
     std::vector<int>& remaining_nodes) // Pass the set of unvisited nodes)
 {
     
-    printf("doing step %d\n", stepcount);
+    // printf("doing step %d\n", stepcount);
     stepcount++;
 
     double start_time = CycleTimer::currentSeconds();
@@ -183,8 +183,8 @@ void bottom_up_step(
         //TODO: no need to check if its not visited, we are only checking the remaining nodes
         if (distances[node] == NOT_VISITED_MARKER) {
             //check if it has an incoming edge from a node in the fronteir 
-            double inner_start_time = CycleTimer::currentSeconds();
-            for (int i=0; i<frontier->count; i++) {
+            // double inner_start_time = CycleTimer::currentSeconds();
+            // for (int i=0; i<frontier->count; i++) {
                 //collecting all the nodes incoming edges 
                 int start_edge = g->incoming_starts[node];
                 int end_edge = (node == g->num_nodes - 1)
@@ -196,25 +196,25 @@ void bottom_up_step(
                     int incoming = g->incoming_edges[neighbor];
                     if (frontier->present[incoming]) {
                         //TODO: thibk about wethe ur need compare and swap here 
-                        // if (distances[node] == NOT_VISITED_MARKER) {
-                        //      distances[incoming] + 1;
-                        //      new_frontier->present[node] = true;
-                        //      counter++;
-                        //     //think about why you need it 
-                        //     //how do i restrucutre so I don't need this anymore 
-                        // }
-                        if (__sync_bool_compare_and_swap(&distances[node], NOT_VISITED_MARKER, distances[incoming] + 1)) { //my distance is the incoming edges already collected distance + 1  
-                            //int index = 0;
-                            new_frontier->present[node] = true;
-                            // frontier->vertices[counter] = node; 
-                            counter++; 
-                            break;
-                            // #pragma omp atomic capture
-                            // counter = new_frontier->count++; //add this node to the new fonteir
-                            // new_frontier->vertices[index] = node;
+                        if (distances[node] == NOT_VISITED_MARKER) {
+                             distances[incoming] + 1;
+                             new_frontier->present[node] = true;
+                             counter++;
+                            //think about why you need it 
+                            //how do i restrucutre so I don't need this anymore 
                         }
+                        // if (__sync_bool_compare_and_swap(&distances[node], NOT_VISITED_MARKER, distances[incoming] + 1)) { //my distance is the incoming edges already collected distance + 1  
+                        //     //int index = 0;
+                        //     new_frontier->present[node] = true;
+                        //     // frontier->vertices[counter] = node; 
+                        //     counter++; 
+                        //     break;
+                        //     // #pragma omp atomic capture
+                        //     // counter = new_frontier->count++; //add this node to the new fonteir
+                        //     // new_frontier->vertices[index] = node;
+                        // }
                     }
-                }
+                // }
                 double inner_end_time = CycleTimer::currentSeconds();
             }
             
