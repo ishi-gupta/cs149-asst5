@@ -30,7 +30,6 @@ void vertex_set_init(vertex_set* list, int count) {
     vertex_set_clear(list);
 }
 
-#define THREADS 8
 // Take one step of "top-down" BFS.  For each vertex on the frontier,
 // follow all outgoing edges, and add all neighboring vertices to the
 // new_frontier.
@@ -42,8 +41,6 @@ void top_down_step(
 {
 
     //GO THROUGH EVERY NODE IN OUR CURRENT FRONTIER
-    //#pragma omp parallel for 
-    // #define THREADS 4
     #pragma omp parallel for schedule(dynamic, 100)
     //for each node id in the current frontier 
     for (int i=0; i<frontier->count; i++) {
@@ -241,6 +238,41 @@ void bottom_up_step(
 
 }
 
+void bottom_up_step_2(
+    Graph g,
+    vertex_set* frontier,
+    vertex_set* new_frontier,
+    int* distances)
+{
+    double start_time = CycleTimer::currentSeconds();
+    
+    int counter = 0;
+    
+    #pragma omp parallel for schedule(dynamic, 100) reduction(+:counter)
+    for (size_t node = 0; node < g->num_nodes; node++){
+        if (distances[node] == NOT_VISITED_MARKER) {
+            //check if it has an incoming edge from a node in the fronteir 
+            int start_edge = g->incoming_starts[node];
+            int end_edge = (node == g->num_nodes - 1) ? g->num_edges : g->incoming_starts[node + 1];
+            //going through all the nodes who are incoming to me
+            for (int neighbor = start_edge; neighbor < end_edge; neighbor++) {
+                int incoming = g->incoming_edges[neighbor];
+                if (frontier->present[incoming]) {
+                    //TODO: thibk about wethe ur need compare and swap here 
+                    if (__sync_bool_compare_and_swap(&distances[node], NOT_VISITED_MARKER, distances[incoming] + 1)) { //my distance is the incoming edges already collected distance + 1  
+                        new_frontier->present[node] = true;
+                        counter++; 
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    
+    //counting how many nodes are there in the next fronteir
+    new_frontier->count = counter;
+}
+
 
 void bfs_bottom_up(Graph graph, solution* sol)
 {
@@ -257,12 +289,12 @@ void bfs_bottom_up(Graph graph, solution* sol)
     for (int i=0; i<graph->num_nodes; i++)
         sol->distances[i] = NOT_VISITED_MARKER;
 
-    std::vector<int> remaining_nodes;
-    for (int i = 0; i < graph->num_nodes; i++) {
-        remaining_nodes.push_back(i);
-    }
+    // std::vector<int> remaining_nodes;
+    // for (int i = 0; i < graph->num_nodes; i++) {
+    //     remaining_nodes.push_back(i);
+    // }
+    
     // setup frontier with the root node
-    //frontier->vertices[frontier->count++] = ROOT_NODE_ID;
     frontier->present[ROOT_NODE_ID] = true;
     sol->distances[ROOT_NODE_ID] = 0;
     frontier->count = 1;
@@ -275,7 +307,7 @@ void bfs_bottom_up(Graph graph, solution* sol)
 
         vertex_set_clear(new_frontier);
 
-        bottom_up_step(graph, frontier, new_frontier, sol->distances, remaining_nodes);
+        bottom_up_step_2(graph, frontier, new_frontier, sol->distances);
 
 #ifdef VERBOSE
     double end_time = CycleTimer::currentSeconds();
