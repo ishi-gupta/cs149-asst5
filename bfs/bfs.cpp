@@ -175,10 +175,12 @@ void bottom_up_step(
     double start_time = CycleTimer::currentSeconds();
     //j is the node we are checking to see if is in the fronteir
     int counter = 0;
+    //TODO figure out what ynamic 100 represents 
     #pragma omp parallel for schedule(dynamic, 100) reduction(+:counter)//unifies thread local counters at the end 
     for (size_t i = 0; i < remaining_nodes.size(); i++){
         //printf("hi im checking node %d\n", node);
         int node = remaining_nodes[i];
+        //TODO: no need to check if its not visited, we are only checking the remaining nodes
         if (distances[node] == NOT_VISITED_MARKER) {
             //check if it has an incoming edge from a node in the fronteir 
             double inner_start_time = CycleTimer::currentSeconds();
@@ -193,11 +195,20 @@ void bottom_up_step(
                 for (int neighbor=start_edge; neighbor<end_edge; neighbor++) {
                     int incoming = g->incoming_edges[neighbor];
                     if (frontier->present[incoming]) {
+                        //TODO: thibk about wethe ur need compare and swap here 
+                        // if (distances[node] == NOT_VISITED_MARKER) {
+                        //      distances[incoming] + 1;
+                        //      new_frontier->present[node] = true;
+                        //      counter++;
+                        //     //think about why you need it 
+                        //     //how do i restrucutre so I don't need this anymore 
+                        // }
                         if (__sync_bool_compare_and_swap(&distances[node], NOT_VISITED_MARKER, distances[incoming] + 1)) { //my distance is the incoming edges already collected distance + 1  
                             //int index = 0;
                             new_frontier->present[node] = true;
                             // frontier->vertices[counter] = node; 
                             counter++; 
+                            break;
                             // #pragma omp atomic capture
                             // counter = new_frontier->count++; //add this node to the new fonteir
                             // new_frontier->vertices[index] = node;
@@ -210,9 +221,9 @@ void bottom_up_step(
         }
     }
     double end_time = CycleTimer::currentSeconds();
-    printf("Outerloop time for step %d:  %.4f sec. %f percent of total time. \n", stepcount, end_time - start_time, (end_time - start_time)/end_time - start_time *100);
-    printf("Middleloop time for step %d:  %.4f sec %f percent of total time. \n", stepcount, inner_end_time - inner_start_time, (inner_end_time - inner_start_time)/(end_time - start_time) *100);
-    printf("Innerloop time for step %d:  %.4f sec %f percent of total time. \n", stepcount, inner_end_time - inner_start_time2,(inner_end_time - inner_start_time2)/(end_time - start_time) *100);
+    // printf("Outerloop time for step %d:  %.4f sec. %f percent of total time. \n", stepcount, end_time - start_time, (end_time - start_time)/end_time - start_time *100);
+    // printf("Middleloop time for step %d:  %.4f sec %f percent of total time. \n", stepcount, inner_end_time - inner_start_time, (inner_end_time - inner_start_time)/(end_time - start_time) *100);
+    // printf("Innerloop time for step %d:  %.4f sec %f percent of total time. \n", stepcount, inner_end_time - inner_start_time2,(inner_end_time - inner_start_time2)/(end_time - start_time) *100);
 
 
     //counting how many nodes are there in the next fronteir
