@@ -1,0 +1,792 @@
+----------------------------------------------------------
+Max system threads = 8
+----------------------------------------------------------
+Loading graph...
+
+Graph stats:
+  Edges: 48
+  Nodes: 16
+----------------------------------------------------------
+Running with 1 threads
+Running top-down BFS
+frontier
+frontier count: 1
+frontier vertices: 
+0
+frontier present: 
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+new frontier
+frontier count: 0
+frontier vertices: 
+frontier present: 
+224
+155
+7
+68
+164
+127
+0
+0
+224
+155
+7
+68
+164
+127
+0
+0
+frontier
+frontier count: 2
+frontier vertices: 
+1
+4
+frontier present: 
+224
+155
+7
+68
+164
+127
+0
+0
+224
+155
+7
+68
+164
+127
+0
+0
+new frontier
+frontier count: 0
+frontier vertices: 
+frontier present: 
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+frontier
+frontier count: 3
+frontier vertices: 
+2
+5
+8
+frontier present: 
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+new frontier
+frontier count: 0
+frontier vertices: 
+frontier present: 
+224
+155
+7
+68
+164
+127
+0
+0
+224
+155
+7
+68
+164
+127
+0
+0
+frontier
+frontier count: 4
+frontier vertices: 
+3
+6
+9
+12
+frontier present: 
+224
+155
+7
+68
+164
+127
+0
+0
+224
+155
+7
+68
+164
+127
+0
+0
+new frontier
+frontier count: 0
+frontier vertices: 
+frontier present: 
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+frontier
+frontier count: 3
+frontier vertices: 
+7
+10
+13
+frontier present: 
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+new frontier
+frontier count: 0
+frontier vertices: 
+frontier present: 
+224
+155
+7
+68
+164
+127
+0
+0
+224
+155
+7
+68
+164
+127
+0
+0
+frontier
+frontier count: 2
+frontier vertices: 
+11
+14
+frontier present: 
+224
+155
+7
+68
+164
+127
+0
+0
+224
+155
+7
+68
+164
+127
+0
+0
+new frontier
+frontier count: 0
+frontier vertices: 
+frontier present: 
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+frontier
+frontier count: 1
+frontier vertices: 
+15
+frontier present: 
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+new frontier
+frontier count: 0
+frontier vertices: 
+frontier present: 
+224
+155
+7
+68
+164
+127
+0
+0
+224
+155
+7
+68
+164
+127
+0
+0
+Testing Correctness of Top Down
+Testing Correctness of Bottom Up
+starting bfs hybrid
+count: 1
+pre seg fault 
+frontier
+frontier count: 1
+frontier vertices: 
+0
+frontier present: 
+1
+152
+193
+86
+71
+86
+0
+0
+80
+148
+193
+86
+71
+86
+0
+0
+new frontier
+frontier count: 0
+frontier vertices: 
+frontier present: 
+1
+0
+0
+0
+1
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+preseg fault2
+preseg fault3
+list count: 2
+vetices array:
+1
+4
+seg fault should not print
+preseg fault2
+preseg fault3
+list count: 3
+vetices array:
+0
+8
+0
+seg fault should not print
+preseg fault2
+preseg fault3
+list count: 4
+vetices array:
+1
+4
+0
+0
+seg fault should not print
+preseg fault2
+preseg fault3
+list count: 3
+vetices array:
+0
+8
+0
+seg fault should not print
+preseg fault2
+preseg fault3
+list count: 2
+vetices array:
+1
+4
+seg fault should not print
+preseg fault2
+preseg fault3
+list count: 1
+vetices array:
+0
+seg fault should not print
+Testing Correctness of Hybrid
+----------------------------------------------------------
+Running with 2 threads
+Running top-down BFS
+frontier
+frontier count: 1
+frontier vertices: 
+0
+frontier present: 
+96
+154
+193
+86
+71
+86
+0
+0
+208
+149
+193
+86
+71
+86
+0
+0
+new frontier
+frontier count: 0
+frontier vertices: 
+frontier present: 
+1
+0
+0
+0
+1
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+frontier
+frontier count: 2
+frontier vertices: 
+1
+4
+frontier present: 
+1
+0
+0
+0
+1
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+new frontier
+frontier count: 0
+frontier vertices: 
+frontier present: 
+96
+154
+193
+86
+71
+86
+0
+0
+208
+149
+193
+86
+71
+86
+0
+0
+frontier
+frontier count: 3
+frontier vertices: 
+2
+5
+8
+frontier present: 
+96
+154
+193
+86
+71
+86
+0
+0
+208
+149
+193
+86
+71
+86
+0
+0
+new frontier
+frontier count: 0
+frontier vertices: 
+frontier present: 
+1
+0
+0
+0
+1
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+frontier
+frontier count: 4
+frontier vertices: 
+3
+6
+9
+12
+frontier present: 
+1
+0
+0
+0
+1
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+new frontier
+frontier count: 0
+frontier vertices: 
+frontier present: 
+96
+154
+193
+86
+71
+86
+0
+0
+208
+149
+193
+86
+71
+86
+0
+0
+frontier
+frontier count: 3
+frontier vertices: 
+7
+10
+13
+frontier present: 
+96
+154
+193
+86
+71
+86
+0
+0
+208
+149
+193
+86
+71
+86
+0
+0
+new frontier
+frontier count: 0
+frontier vertices: 
+frontier present: 
+1
+0
+0
+0
+1
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+frontier
+frontier count: 2
+frontier vertices: 
+11
+14
+frontier present: 
+1
+0
+0
+0
+1
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+new frontier
+frontier count: 0
+frontier vertices: 
+frontier present: 
+96
+154
+193
+86
+71
+86
+0
+0
+208
+149
+193
+86
+71
+86
+0
+0
+frontier
+frontier count: 1
+frontier vertices: 
+15
+frontier present: 
+96
+154
+193
+86
+71
+86
+0
+0
+208
+149
+193
+86
+71
+86
+0
+0
+new frontier
+frontier count: 0
+frontier vertices: 
+frontier present: 
+1
+0
+0
+0
+1
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+Testing Correctness of Top Down
+Testing Correctness of Bottom Up
+starting bfs hybrid
+count: 1
+pre seg fault 
+frontier
+frontier count: 1
+frontier vertices: 
+0
+frontier present: 
+1
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+new frontier
+frontier count: 0
+frontier vertices: 
+frontier present: 
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+preseg fault2
+preseg fault3
+list count: 2
+vetices array:
+1
+4
+seg fault should not print
+preseg fault2
+preseg fault3
+list count: 3
+vetices array:
+0
+0
+0
+seg fault should not print
+preseg fault2
+preseg fault3
+list count: 4
+vetices array:
+1
+4
+0
+0
+seg fault should not print
+preseg fault2
+preseg fault3
+list count: 3
+vetices array:
+0
+0
+0
+seg fault should not print
+preseg fault2
+preseg fault3
+list count: 2
+vetices array:
+1
+4
+seg fault should not print
+preseg fault2
+preseg fault3
+list count: 1
+vetices array:
+0
+seg fault should not print
+Testing Correctness of Hybrid
+----------------------------------------------------------
+Running with 4 threads
