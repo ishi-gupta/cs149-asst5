@@ -329,7 +329,7 @@ void bfs_hybrid(Graph graph, solution* sol)
             // Here we’re just using max_edges as an example:
             // If max_edges is large, switch to bottom-up
             // Choose a threshold experimentally (e.g., 1000, or based on graph properties)
-            if (max_edges > 1000) {
+            if (max_edges > 100) {
                 // Switch to bottom-up
                 flag = 0;
                 vertex_set_top_to_bottom(new_frontier);
@@ -346,10 +346,10 @@ void bfs_hybrid(Graph graph, solution* sol)
             // For now, remove the logic that switches back to top-down
             // If you later decide to re-add it, you could check frontier size again,
             // for example:
-            // if ((float)new_frontier->count / graph->num_nodes < 0.0001) {
-            //     flag = 1;
-            //     vertex_set_bottom_to_top(new_frontier);
-            // }
+            if ((float)new_frontier->count / graph->num_nodes < 0.001) {
+                flag = 1;
+                vertex_set_bottom_to_top(new_frontier);
+            }
 
             total_iterations++;
         }
