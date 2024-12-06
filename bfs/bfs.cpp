@@ -55,17 +55,6 @@ void vertex_set_top_to_bottom(vertex_set* list){
     }
 }
 
-// void print_frontier(vertex_set* list){
-//     printf("frontier count: %d\n", list->count);
-//     printf("frontier vertices: \n");
-//     for (int i = 0; i < list->count; i++){
-//         printf("%d\n", list->vertices[i]);
-//     }
-//     printf("frontier present: \n");
-//     for (int i = 0; i < list->max_vertices; i++){
-//         printf("%d\n", list->present[i]);
-//     }
-// }
 
 //takes a frontier in bottom up format and gets it ready for top down bfs
 void vertex_set_bottom_to_top(vertex_set* list){
@@ -126,10 +115,37 @@ void top_down_step(
                     new_frontier->vertices[index] = outgoing;
                 }
             }
+
+            //count outgoing vertices from new frontier 
+
         }
     }
 }
 
+//change this to return the metric we are using 
+//do the step and check the metric 
+void compute_frontier_out_degrees(Graph g, vertex_set* frontier, int* max_edges, double* avg_out_degree) {
+    int64_t total_edges = 0;
+    int local_max = 0;
+
+    #pragma omp parallel for reduction(+:total_edges) reduction(max:local_max)
+    for (int i = 0; i < frontier->count; i++) {
+        int node = frontier->vertices[i];
+        int start_edge = g->outgoing_starts[node];
+        int end_edge = (node == g->num_nodes - 1)
+                         ? g->num_edges
+                         : g->outgoing_starts[node + 1];
+        int out_degree = end_edge - start_edge;
+
+        total_edges += out_degree;
+        if (out_degree > local_max) {
+            local_max = out_degree;
+        }
+    }
+
+    *max_edges = local_max;
+    *avg_out_degree = (frontier->count > 0) ? (double)total_edges / frontier->count : 0.0;
+}
 
 
 
@@ -272,73 +288,160 @@ void bfs_bottom_up(Graph graph, solution* sol)
 void bfs_hybrid(Graph graph, solution* sol)
 {
     printf("starting bfs hybrid\n");
-    //run top down step 
+
     vertex_set list1;
     vertex_set list2;
+    // Initialize for bottom-up, but we’ll use the same lists for top-down as well
     vertex_set_init_bottom(&list1, graph->num_nodes);
     vertex_set_init_bottom(&list2, graph->num_nodes);
 
     vertex_set* frontier = &list1;
     vertex_set* new_frontier = &list2;
 
-    // initialize all nodes to NOT_VISITED
+    // initialize distances
     for (int i=0; i<graph->num_nodes; i++)
         sol->distances[i] = NOT_VISITED_MARKER;
 
-    // setup frontier with the root node to start with top down
+    // Set up frontier with root node for top-down start
     frontier->vertices[frontier->count++] = ROOT_NODE_ID;
     sol->distances[ROOT_NODE_ID] = 0;
-    // printf("count: %d\n", frontier->count);
 
-    //setup frontier with the root node to start with bottom up
+    // Also mark it present for bottom-up mode
     frontier->present[ROOT_NODE_ID] = true;
 
+    int total_iterations = 0;
+    int top_down_iterations = 0;
+    int flag = 1; // Start with top-down BFS
 
-    // // swap pointers
-    // vertex_set* tmp = frontier;
-    // frontier = new_frontier;
-    // new_frontier = tmp;
-
-    int total_iterations = 0; 
-    int top_down_iterations = 0;    
-    int flag = 1; 
     while (frontier->count != 0) {
-        //printf("frontier count: %d\n", frontier->count);
 
-        if (flag ==1){
+        if (flag == 1) {
+            // Top-down step
             vertex_set_clear_top(new_frontier);
-            top_down_step(graph, frontier, new_frontier, sol->distances); 
+            top_down_step(graph, frontier, new_frontier, sol->distances);
 
-            //printf("ratio = %f\n", ((float)new_frontier->count/ graph->num_nodes));
-            if (((float)new_frontier->count/ graph->num_nodes > 0.00001)){
+            // Compute frontier metrics after top-down step
+            int max_edges = 0;
+            double avg_out_degree = 0.0;
+            compute_frontier_out_degrees(graph, new_frontier, &max_edges, &avg_out_degree);
+
+            // Decide whether to switch to bottom-up using max_edges (or avg_out_degree)
+            // Here we’re just using max_edges as an example:
+            // If max_edges is large, switch to bottom-up
+            // Choose a threshold experimentally (e.g., 1000, or based on graph properties)
+            if (max_edges > 1000) {
+                // Switch to bottom-up
                 flag = 0;
                 vertex_set_top_to_bottom(new_frontier);
             }
+
             total_iterations++;
             top_down_iterations++;
-        }
-        else {
-            vertex_set_clear_bottom(new_frontier); 
+
+        } else {
+            // Bottom-up step
+            vertex_set_clear_bottom(new_frontier);
             bottom_up_step_2(graph, frontier, new_frontier, sol->distances);
+
+            // For now, remove the logic that switches back to top-down
+            // If you later decide to re-add it, you could check frontier size again,
+            // for example:
+            // if ((float)new_frontier->count / graph->num_nodes < 0.0001) {
+            //     flag = 1;
+            //     vertex_set_bottom_to_top(new_frontier);
+            // }
+
             total_iterations++;
         }
+
+        // Swap pointers
         vertex_set* tmp = frontier;
         frontier = new_frontier;
         new_frontier = tmp;
+    }
 
-    }
-    printf("total iterations: %d\n", total_iterations);
-    printf("top down iterations: %d\n", top_down_iterations);
-    }
+    // Optional: print out iteration counts
+    // printf("total iterations: %d\n", total_iterations);
+    // printf("top down iterations: %d\n", top_down_iterations);
+}
 
 // void bfs_hybrid(Graph graph, solution* sol)
 // {
-//     // //top down 
-//     bfs_top_down(graph, sol);
+//     printf("starting bfs hybrid\n");
+//     //run top down step 
+//     vertex_set list1;
+//     vertex_set list2;
+//     vertex_set_init_bottom(&list1, graph->num_nodes);
+//     vertex_set_init_bottom(&list2, graph->num_nodes);
 
-//     // // bottom up 
-//     // bfs_bottom_up(graph, sol);
-    
+//     vertex_set* frontier = &list1;
+//     vertex_set* new_frontier = &list2;
+
+//     // initialize all nodes to NOT_VISITED
+//     for (int i=0; i<graph->num_nodes; i++)
+//         sol->distances[i] = NOT_VISITED_MARKER;
+
+//     // setup frontier with the root node to start with top down
+//     frontier->vertices[frontier->count++] = ROOT_NODE_ID;
+//     sol->distances[ROOT_NODE_ID] = 0;
+//     // printf("count: %d\n", frontier->count);
+
+//     //setup frontier with the root node to start with bottom up
+//     frontier->present[ROOT_NODE_ID] = true;
+
+
+//     // // swap pointers
+//     // vertex_set* tmp = frontier;
+//     // frontier = new_frontier;
+//     // new_frontier = tmp;
+
+//     int total_iterations = 0; 
+//     int top_down_iterations = 0;    
+//     int flag = 1; 
+//     while (frontier->count != 0) {
+//         //printf("frontier count: %d\n", frontier->count);
+
+//         if (flag ==1){
+//             vertex_set_clear_top(new_frontier);
+//             top_down_step(graph, frontier, new_frontier, sol->distances); 
+
+//             //printf("ratio = %f\n", ((float)new_frontier->count/ graph->num_nodes));
+//             if (((float)new_frontier->count/ graph->num_nodes > 0.0001)){
+//                 // printf("switching to bottom up\n");
+//                 flag = 0;
+//                 vertex_set_top_to_bottom(new_frontier);
+//             }
+//             total_iterations++;
+//             top_down_iterations++;
+//         }
+//         else {
+//             vertex_set_clear_bottom(new_frontier); 
+//             bottom_up_step_2(graph, frontier, new_frontier, sol->distances);
+
+//             if (((float)new_frontier->count/ graph->num_nodes < 0.0001)){
+//                 // printf("switching to top down\n");
+//                 flag = 1;
+//                 vertex_set_bottom_to_top(new_frontier);
+//             }
+//             total_iterations++;
+//         }
+//         vertex_set* tmp = frontier;
+//         frontier = new_frontier;
+//         new_frontier = tmp;
+
 //     }
+//     // printf("total iterations: %d\n", total_iterations);
+//     // printf("top down iterations: %d\n", top_down_iterations);
+//     }
+
+void bfs_hybrid2(Graph graph, solution* sol)
+{
+    // //top down 
+    bfs_top_down(graph, sol);
+
+    // //bottom up 
+    // bfs_bottom_up(graph, sol);
+    
+}
 
 
