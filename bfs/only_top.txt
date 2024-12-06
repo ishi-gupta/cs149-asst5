@@ -1,0 +1,99 @@
+Max system threads = 8
+Running with 8 threads
+
+Graph: grid1000x1000.graph
+
+Top down bfs
+Running top-down BFS
+ref_time: 24.1861s
+stu_time: 35.2142s
+
+Bottom up bfs
+ref_time: 37.9261s
+stu_time: 84.4219s
+
+Hybrid bfs
+Running top-down BFS
+ref_time: 116.105s
+stu_time: 0.0375145s
+
+Graph: soc-livejournal1_68m.graph
+
+Top down bfs
+Running top-down BFS
+ref_time: 0.135793s
+stu_time: 0.203434s
+
+Bottom up bfs
+ref_time: 0.113198s
+stu_time: 0.150282s
+
+Hybrid bfs
+Running top-down BFS
+ref_time: 0.0681369s
+stu_time: 0.193324s
+
+Graph: com-orkut_117m.graph
+
+Top down bfs
+Running top-down BFS
+ref_time: 0.153004s
+stu_time: 0.179739s
+
+Bottom up bfs
+ref_time: 0.119396s
+stu_time: 0.173902s
+
+Hybrid bfs
+Running top-down BFS
+ref_time: 0.0442598s
+stu_time: 0.177429s
+
+Graph: random_500m.graph
+
+Top down bfs
+Running top-down BFS
+ref_time: 4.749s
+stu_time: 5.73025s
+
+Bottom up bfs
+ref_time: 12.4786s
+stu_time: 15.156s
+
+Hybrid bfs
+Running top-down BFS
+ref_time: 2.97329s
+stu_time: 5.79295s
+
+Graph: rmat_200m.graph
+
+Top down bfs
+Running top-down BFS
+ref_time: 2.23309s
+stu_time: 2.70011s
+
+Bottom up bfs
+ref_time: 2.17897s
+stu_time: 3.25769s
+
+Hybrid bfs
+Running top-down BFS
+ref_time: 1.86896s
+stu_time: 2.65236s
+
+
+--------------------------------------------------------------------------
+SCORES :                    |   Top-Down    |   Bott-Up    |    Hybrid    |
+--------------------------------------------------------------------------
+grid1000x1000.graph         |      1.95 / 2 |     1.50 / 3 |     3.00 / 3 |
+--------------------------------------------------------------------------
+soc-livejournal1_68m.graph  |      1.87 / 2 |     3.00 / 3 |     0.91 / 3 |
+--------------------------------------------------------------------------
+com-orkut_117m.graph        |      2.00 / 2 |     2.92 / 3 |     0.60 / 3 |
+--------------------------------------------------------------------------
+random_500m.graph           |      7.00 / 7 |     8.00 / 8 |     5.01 / 8 |
+--------------------------------------------------------------------------
+rmat_200m.graph             |      7.00 / 7 |     7.50 / 8 |     8.00 / 8 |
+--------------------------------------------------------------------------
+TOTAL                                                      |  60.26 / 70 |
+--------------------------------------------------------------------------

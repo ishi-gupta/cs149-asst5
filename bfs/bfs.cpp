@@ -303,7 +303,7 @@ void bfs_hybrid(Graph graph, solution* sol)
     int top_down_iterations = 0;    
     int flag = 1; 
     while (frontier->count != 0) {
-        printf("frontier count: %d\n", frontier->count);
+        //printf("frontier count: %d\n", frontier->count);
 
         if (flag ==1){
             vertex_set_clear_top(new_frontier);
@@ -330,5 +330,15 @@ void bfs_hybrid(Graph graph, solution* sol)
     printf("total iterations: %d\n", total_iterations);
     printf("top down iterations: %d\n", top_down_iterations);
     }
+
+// void bfs_hybrid(Graph graph, solution* sol)
+// {
+//     // //top down 
+//     bfs_top_down(graph, sol);
+
+//     // // bottom up 
+//     // bfs_bottom_up(graph, sol);
+    
+//     }
 
 

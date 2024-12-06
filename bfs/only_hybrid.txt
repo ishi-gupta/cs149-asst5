@@ -1,0 +1,11 @@
+Max system threads = 8
+Running with 8 threads
+
+Graph: grid1000x1000.graph
+
+Top down bfs
+Running top-down BFS
+ref_time: 36.5668s
+stu_time: 40.4397s
+
+Bottom up bfs
